@@ -2,12 +2,15 @@ import { Component } from "react";
 // import logo from './logo.svg';
 import "./App.css";
 
+import CardList from './components/card-list/card-list.component'
+import SearchBox from './components/search-bar/search-box.component'
 class App extends Component {
   constructor() {
     super();
 
     this.state = {
       monsters: [],
+      searchField: ''
     };
     // logging to see order that functions are ran
     console.log('constructor');
@@ -29,31 +32,37 @@ class App extends Component {
       )
   }
 
+  // search bar event handler
+  onSearchChange = (event) => {
+    const searchField = event.target.value.toLocaleLowerCase();
+    this.setState(() => {
+      return { searchField }
+    });
+  };
+
   render() {
     // console.log to see order that functions are ran
     console.log('render');
+
+    const { monsters, searchField } = this.state;
+    const { onSearchChange } = this;
+
+    const filteredMonsters = monsters.filter((monster) => {
+      return monster.name.toLocaleLowerCase().includes(searchField);
+    });
+
     return <div className="App">
       {/* search bar functionality */}
-      <input className="search-box" type="search" placeholder="search monsters" onChange={(event) => {
-        const searchString = event.target.value.toLocaleLowerCase();
-        const filteredMonsters = this.state.monsters.filter((monster) => {
-          return monster.name.toLocaleLowerCase().includes(searchString);
-        });
-
-        this.setState(() => {
-          return { monsters: filteredMonsters }
-        })
-      }} />
-      {this.state.monsters.map((monster) => {
-        return (
-          <div key={monster.id}>
-            <h1 >{monster.name}</h1>
-          </div>
-        )
-      })
-      }
+      <SearchBox
+        className="search-box"
+        placeholder="search monsters"
+        onChangeHandler={onSearchChange}
+      />
+      <CardList
+        monsters={filteredMonsters}
+      />
     </div>;
-  }
-}
+  };
+};
 
 export default App;
